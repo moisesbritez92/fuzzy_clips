@@ -1,0 +1,105 @@
+; ==================================================================
+; Script de ejecución para Caso GMP
+; Instrucciones para FUZZY CLIPS
+; ==================================================================
+
+; Paso 1: Cargar el caso GMP
+; Este archivo carga automáticamente bc.clp
+(load "src/fuzzyclips/case_gmp.clp")
+
+; El script case_gmp.clp ya ejecuta (reset) y muestra toda la información
+; Si se desea ejecutar paso a paso manualmente, seguir estos pasos:
+
+; ==================================================================
+; EJECUCIÓN MANUAL PASO A PASO (opcional)
+; ==================================================================
+
+; 1. Limpiar memoria
+; (clear)
+
+; 2. Cargar base de conocimientos
+; (load "src/fuzzyclips/bc.clp")
+
+; 3. Resetear
+; (reset)
+
+; 4. Afirmar hechos del ejemplo 1 (patrón intermitente)
+; (assert (carga (90 0) (95 1) (100 1) (110 0)))
+; (assert (temperatura (85 0) (87 1) (95 1) (100 0)))
+; (assert (vibracion (3.5 0) (4.2 1) (5 1) (7 0)))
+; (assert (historial_fallas (5 0.3) (5.5 1) (6 0.3)))
+; (assert (criticidad (0.85 0) (0.9 1) (1.0 1)))
+
+; 5. Ver hechos antes de inferencia
+; (facts)
+
+; 6. Ejecutar motor de inferencia
+; (run)
+
+; 7. Ver hechos después de inferencia
+; (facts)
+
+; 8. Ver agenda de reglas
+; (agenda)
+
+; ==================================================================
+; COMANDOS ÚTILES PARA DEPURACIÓN
+; ==================================================================
+
+; Activar watch para ver qué reglas se disparan
+; (watch rules)
+; (watch facts)
+
+; Ver todas las reglas definidas
+; (list-defrules)
+
+; Ver todos los templates definidos
+; (list-deftemplates)
+
+; Ver información de una regla específica
+; (ppdefrule R3-cliente-critico)
+
+; Mostrar valores de un hecho borroso
+; (fuzzy-facts)
+
+; ==================================================================
+; OTROS CASOS DE PRUEBA
+; ==================================================================
+
+; Para probar el caso crítico (hospital):
+; (reset)
+; (assert (carga muy_alta))
+; (assert (temperatura alta))
+; (assert (vibracion media))
+; (assert (historial_fallas bajo))
+; (assert (criticidad critico))
+; (run)
+; (facts)
+
+; Para probar el caso normal (residencial):
+; (reset)
+; (assert (carga baja))
+; (assert (temperatura normal))
+; (assert (vibracion baja))
+; (assert (historial_fallas bajo))
+; (assert (criticidad residencial))
+; (run)
+; (facts)
+
+; ==================================================================
+; SALIDA Y GUARDADO
+; ==================================================================
+
+; Para guardar los hechos en archivo
+; (open "output_gmp.txt" output "w")
+; (facts output)
+; (close output)
+
+; Para guardar toda la sesión
+; (dribble-on "sesion_gmp.log")
+; ... ejecutar comandos ...
+; (dribble-off)
+
+; ==================================================================
+; FIN DEL SCRIPT
+; ==================================================================
