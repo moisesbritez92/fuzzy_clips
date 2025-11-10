@@ -1,0 +1,186 @@
+; ==================================================================
+; Script de ejecución para Caso Mamdani
+; Instrucciones para FUZZY CLIPS
+; ==================================================================
+
+; Paso 1: Cargar el caso Mamdani
+; Este archivo carga automáticamente bc.clp
+(load "src/fuzzyclips/case_mamdani.clp")
+
+; El script case_mamdani.clp ya ejecuta (reset) y muestra toda la información
+; Si se desea ejecutar paso a paso manualmente, seguir estos pasos:
+
+; ==================================================================
+; EJECUCIÓN MANUAL PASO A PASO (opcional)
+; ==================================================================
+
+; 1. Limpiar memoria
+; (clear)
+
+; 2. Cargar base de conocimientos
+; (load "src/fuzzyclips/bc.clp")
+
+; 3. Resetear
+; (reset)
+
+; 4. Afirmar números borrosos de entrada
+; (assert (carga (70 0) (85 1) (100 1) (115 0)))
+; (assert (temperatura (75 0) (82 1) (92 1) (98 0)))
+; (assert (vibracion (2.5 0) (4.0 1) (5.5 0)))
+; (assert (historial_fallas (0.5 0) (1.5 1) (2.5 0)))
+; (assert (criticidad (0.75 0) (0.85 1) (0.95 1) (1.0 0)))
+
+; 5. Ver hechos antes de inferencia
+; (facts)
+
+; 6. Ejecutar motor de inferencia Mamdani
+; (run)
+
+; 7. Ver hechos después de inferencia
+; (facts)
+
+; 8. Para obtener valor defuzzificado
+; (fuzzy-value prioridad)
+; o
+; (moment-defuzzify prioridad)
+
+; ==================================================================
+; COMANDOS ESPECÍFICOS DE FUZZY CLIPS
+; ==================================================================
+
+; Establecer método de defuzzificación
+; (set-fuzzy-defuzzification centroid)
+; Opciones: centroid, mom (mean-of-maximum), lom (largest-of-maximum), som (smallest-of-maximum)
+
+; Ver gráfico ASCII de conjunto borroso
+; (plot-fuzzy-value prioridad)
+
+; Obtener altura máxima de un conjunto
+; (maximum-defuzzify prioridad)
+
+; Área bajo la curva
+; (fuzzy-area prioridad)
+
+; ==================================================================
+; COMANDOS ÚTILES PARA DEPURACIÓN
+; ==================================================================
+
+; Activar watch para ver proceso de inferencia
+; (watch rules)
+; (watch facts)
+; (watch activations)
+
+; Ver todas las reglas
+; (list-defrules)
+
+; Ver información de una regla específica
+; (ppdefrule R1-carga-temp-criticas)
+
+; Ver todos los conjuntos borrosos activos
+; (fuzzy-facts)
+
+; ==================================================================
+; EXPERIMENTACIÓN CON OTROS VALORES
+; ==================================================================
+
+; Experimento 1: Carga muy alta
+; (reset)
+; (assert (carga (110 0) (120 1) (130 1) (140 0)))
+; (assert (temperatura (95 0) (105 1) (115 1) (120 0)))
+; (assert (vibracion (2.5 0) (4.0 1) (5.5 0)))
+; (assert (historial_fallas (0.5 0) (1.5 1) (2.5 0)))
+; (assert (criticidad (0.75 0) (0.85 1) (0.95 1) (1.0 0)))
+; (run)
+; (fuzzy-value prioridad)
+; Esperado: y* > 70 (prioridad alta)
+
+; Experimento 2: Operación normal
+; (reset)
+; (assert (carga (20 0) (30 1) (40 1) (50 0)))
+; (assert (temperatura (30 0) (40 1) (50 1) (60 0)))
+; (assert (vibracion (0.5 0) (1.5 1) (2.5 0)))
+; (assert (historial_fallas (0 1) (0.5 0)))
+; (assert (criticidad (0.1 0) (0.2 1) (0.3 0)))
+; (run)
+; (fuzzy-value prioridad)
+; Esperado: y* < 30 (prioridad baja)
+
+; Experimento 3: Cliente crítico + temperatura media
+; (reset)
+; (assert (carga (50 0) (60 1) (70 1) (80 0)))
+; (assert (temperatura (60 0) (70 1) (80 1) (90 0)))
+; (assert (vibracion (2.5 0) (4.0 1) (5.5 0)))
+; (assert (historial_fallas (0.5 0) (1.5 1) (2.5 0)))
+; (assert (criticidad (0.85 0) (0.95 1) (1.0 0)))
+; (run)
+; (fuzzy-value prioridad)
+; Esperado: y* ≈ 55-65 (media por criticidad)
+
+; ==================================================================
+; ANÁLISIS DE SENSIBILIDAD
+; ==================================================================
+
+; Para ver cómo cambia la salida con variaciones de temperatura:
+; Caso base: temp (75 0) (82 1) (92 1) (98 0), y* = 63.24
+; +10°C: temp (85 0) (92 1) (102 1) (108 0), y* esperado ≈ 70-75
+; -10°C: temp (65 0) (72 1) (82 1) (88 0), y* esperado ≈ 55-60
+
+; ==================================================================
+; COMPARACIÓN DE MÉTODOS DE DEFUZZIFICACIÓN
+; ==================================================================
+
+; Centroide (balance)
+; (set-fuzzy-defuzzification centroid)
+; (fuzzy-value prioridad)
+
+; Mean of Maximum (decisiones agresivas)
+; (set-fuzzy-defuzzification mom)
+; (fuzzy-value prioridad)
+
+; ==================================================================
+; SALIDA Y GUARDADO
+; ==================================================================
+
+; Para exportar gráfico de conjunto de salida
+; (open "output_prioridad.txt" output "w")
+; (plot-fuzzy-value prioridad output)
+; (close output)
+
+; Para guardar sesión completa
+; (dribble-on "sesion_mamdani.log")
+; ... ejecutar comandos ...
+; (dribble-off)
+
+; Para exportar resultados numéricos
+; (open "resultados_mamdani.csv" results "w")
+; (printout results "Metodo,Valor_Defuzz" crlf)
+; (printout results "Centroid," (moment-defuzzify prioridad) crlf)
+; (close results)
+
+; ==================================================================
+; VALIDACIÓN DE RESULTADOS
+; ==================================================================
+
+; Verificar que y* esté en rango esperado [0,100]
+; (bind ?y (moment-defuzzify prioridad))
+; (if (and (>= ?y 0) (<= ?y 100))
+;   then (printout t "✓ Resultado válido: " ?y crlf)
+;   else (printout t "✗ Resultado fuera de rango: " ?y crlf)
+; )
+
+; Verificar clasificación
+; (bind ?y (moment-defuzzify prioridad))
+; (if (< ?y 35)
+;   then (printout t "Clasificación: BAJA" crlf)
+;   else (if (< ?y 65)
+;     then (printout t "Clasificación: MEDIA" crlf)
+;     else (if (< ?y 85)
+;       then (printout t "Clasificación: MEDIA-ALTA" crlf)
+;       else (printout t "Clasificación: ALTA" crlf)
+;     )
+;   )
+; )
+
+; ==================================================================
+; FIN DEL SCRIPT
+; ==================================================================
